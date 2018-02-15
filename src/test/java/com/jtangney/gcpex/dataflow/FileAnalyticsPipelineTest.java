@@ -13,36 +13,36 @@ import com.google.common.io.Files;
 
 public class FileAnalyticsPipelineTest {
 
-	private static final String PROJECT = "jt-exploring-free-tier";
-	private static final String BUCKET = "gs://jt-exploring-free-tier-logs";
-	
-	@Ignore
-	@Test
-	public void runLocal() {
-		FileAnalyticsPipelineOptions options = PipelineOptionsFactory.as(FileAnalyticsPipelineOptions.class);
-		File tmpdir = Files.createTempDir();
-		URL currentdir = this.getClass().getResource("");
+  private static final String PROJECT = "";
+  private static final String BUCKET = "";
 
-		options.setRunner(DirectRunner.class);
-		options.setFileSource(String.format("%s%s", currentdir.getPath(), "*.json"));
-		options.setFileSink(String.format("%s/%s", tmpdir.getAbsolutePath(), this.getClass().getSimpleName()));
+  @Test
+  public void runLocal() {
+    FileAnalyticsPipelineOptions options = PipelineOptionsFactory.as(FileAnalyticsPipelineOptions.class);
+    File tmpdir = Files.createTempDir();
+    URL currentdir = this.getClass().getResource("");
 
-		FileAnalyticsPipeline.run(options);
-	}
+    options.setRunner(DirectRunner.class);
+    options.setFileSource(String.format("%s%s", currentdir.getPath(), "*.json"));
+    options.setFileSink(String.format("%s/%s", tmpdir.getAbsolutePath(), this.getClass().getSimpleName()));
 
-	@Test
-	public void runCloud() {
-		FileAnalyticsPipelineOptions options = PipelineOptionsFactory.as(FileAnalyticsPipelineOptions.class);
+    FileAnalyticsPipeline.run(options);
+  }
 
-		// For Cloud execution, set the Cloud Platform project, staging location,
-		// and specify DataflowRunner.
-		options.setRunner(DataflowRunner.class);
-		options.setProject(PROJECT);
-		options.setStagingLocation(String.format("%s/staging", BUCKET));
-		options.setTempLocation(String.format("%s/temp", BUCKET));
-		options.setFileSource(String.format("%s/files/input/*.json", BUCKET));
-		options.setFileSink(String.format("%s/files/output/", BUCKET));
+  @Ignore // integration test
+  @Test
+  public void runCloud() {
+    FileAnalyticsPipelineOptions options = PipelineOptionsFactory.as(FileAnalyticsPipelineOptions.class);
 
-		FileAnalyticsPipeline.run(options);
-	}
+    // For Cloud execution, set the Cloud Platform project, staging location,
+    // and specify DataflowRunner.
+    options.setRunner(DataflowRunner.class);
+    options.setProject(PROJECT);
+    options.setStagingLocation(String.format("%s/staging", BUCKET));
+    options.setTempLocation(String.format("%s/temp", BUCKET));
+    options.setFileSource(String.format("%s/files/input/*.json", BUCKET));
+    options.setFileSink(String.format("%s/files/output/", BUCKET));
+
+    FileAnalyticsPipeline.run(options);
+  }
 }
