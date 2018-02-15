@@ -30,7 +30,8 @@ public class FileAnalyticsPipelineTest {
     FileAnalyticsPipeline.run(options);
   }
 
-  @Ignore // integration test
+  // integration test - see also pipeline.sh script
+  @Ignore
   @Test
   public void runCloud() {
     FileAnalyticsPipelineOptions options = PipelineOptionsFactory.as(FileAnalyticsPipelineOptions.class);
