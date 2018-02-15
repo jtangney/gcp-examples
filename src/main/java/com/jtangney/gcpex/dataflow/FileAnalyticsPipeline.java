@@ -32,71 +32,71 @@ import com.google.api.services.logging.v2.model.LogEntry;
  */
 public class FileAnalyticsPipeline {
 
-	private static final Logger LOG = LoggerFactory.getLogger(FileAnalyticsPipeline.class);
+  private static final Logger LOG = LoggerFactory.getLogger(FileAnalyticsPipeline.class);
 
-	private static class ParseLogMessageFn extends DoFn<ReadableFile, SimpleLogMessage> {
+  private static class ParseLogMessageFn extends DoFn<ReadableFile, SimpleLogMessage> {
 
-		private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-		@ProcessElement
-		public void processElement(ProcessContext c) {
-			ReadableFile meta = c.element();
-			String filename = meta.getMetadata().resourceId().getFilename();
-			LOG.info(filename);
-			String content;
-			try {
-				content = meta.readFullyAsUTF8String();
-				c.output(parseFile(content));
-			} catch (IOException e) {
-				LOG.error(e.getMessage());
-			}
-		}
+    @ProcessElement
+    public void processElement(ProcessContext c) {
+      ReadableFile meta = c.element();
+      String filename = meta.getMetadata().resourceId().getFilename();
+      LOG.info(filename);
+      String content;
+      try {
+        content = meta.readFullyAsUTF8String();
+        c.output(parseFile(content));
+      } catch (IOException e) {
+        LOG.error(e.getMessage());
+      }
+    }
 
-		private SimpleLogMessage parseFile(String entry) {
-			try {
-				JsonParser parser = new JacksonFactory().createJsonParser(entry);
-				LogEntry logEntry = parser.parse(LogEntry.class);
-				Integer status = logEntry.getHttpRequest().getStatus();
-				String insert = logEntry.getInsertId();
-				return new SimpleLogMessage(status, insert);
-			} catch (IOException e) {
-				LOG.error("IOException parsing entry: " + e.getMessage());
-			} catch (NullPointerException e) {
-				LOG.error("NullPointerException parsing entry: " + e.getMessage());
-			}
-			return null;
-		}
-	}
+    private SimpleLogMessage parseFile(String entry) {
+      try {
+        JsonParser parser = new JacksonFactory().createJsonParser(entry);
+        LogEntry logEntry = parser.parse(LogEntry.class);
+        Integer status = logEntry.getHttpRequest().getStatus();
+        String insert = logEntry.getInsertId();
+        return new SimpleLogMessage(status, insert);
+      } catch (IOException e) {
+        LOG.error("IOException parsing entry: " + e.getMessage());
+      } catch (NullPointerException e) {
+        LOG.error("NullPointerException parsing entry: " + e.getMessage());
+      }
+      return null;
+    }
+  }
 
-	public static void main(String[] args) {
-		PipelineOptionsFactory.register(FileAnalyticsPipelineOptions.class);
-		FileAnalyticsPipelineOptions options = PipelineOptionsFactory.fromArgs(args).withValidation()
-				.as(FileAnalyticsPipelineOptions.class);
+  public static void main(String[] args) {
+    PipelineOptionsFactory.register(FileAnalyticsPipelineOptions.class);
+    FileAnalyticsPipelineOptions options = PipelineOptionsFactory.fromArgs(args).withValidation()
+        .as(FileAnalyticsPipelineOptions.class);
 
-		run(options);
-	}
+    run(options);
+  }
 
-	// testing
-	static void run(FileAnalyticsPipelineOptions options) {
-		LOG.info("Starting pipeline...");
-		LOG.info("Reading input files from " + options.getFileSource());
-		LOG.info("Output files will be written to " + options.getFileSink());
-		Pipeline p = Pipeline.create(options);
-		
-		// step by step for clarity
+  // testing
+  static void run(FileAnalyticsPipelineOptions options) {
+    LOG.info("Starting pipeline...");
+    LOG.info("Reading input files from " + options.getFileSource());
+    LOG.info("Output files will be written to " + options.getFileSink());
+    Pipeline p = Pipeline.create(options);
 
-		// match files in the input dir
-		PCollection<Metadata> matches = p.apply("Match", FileIO.match().filepattern(options.getFileSource()));
-		// read each file in its entirety
-		PCollection<ReadableFile> readables = matches.apply(FileIO.readMatches());
-		// extract content and parse into domain obj
-		PCollection<SimpleLogMessage> logs = readables.apply(ParDo.of(new ParseLogMessageFn()));
-		// call toString on the objs
-		PCollection<String> logStrings = logs.apply(ToString.elements());
-		// write out files to the output dir
-		logStrings.apply(TextIO.write().to(options.getFileSink()));
+    // step by step for clarity
 
-		PipelineResult r = p.run();
-		LOG.info(r.toString());
-	}
+    // match files in the input dir
+    PCollection<Metadata> matches = p.apply("Match", FileIO.match().filepattern(options.getFileSource()));
+    // read each file in its entirety
+    PCollection<ReadableFile> readables = matches.apply(FileIO.readMatches());
+    // extract content and parse into domain obj
+    PCollection<SimpleLogMessage> logs = readables.apply(ParDo.of(new ParseLogMessageFn()));
+    // call toString on the objs
+    PCollection<String> logStrings = logs.apply(ToString.elements());
+    // write out files to the output dir
+    logStrings.apply(TextIO.write().to(options.getFileSink()));
+
+    PipelineResult r = p.run();
+    LOG.info(r.toString());
+  }
 }
