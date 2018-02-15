@@ -13,8 +13,9 @@ import com.google.common.io.Files;
 
 public class FileAnalyticsPipelineTest {
 
-  private static final String PROJECT = "";
-  private static final String BUCKET = "";
+  // TODO: replace with your values
+  private static final String PROJECT = "$MY_PROJECT";
+  private static final String BUCKET = "$MY_BUCKET";
 
   @Test
   public void runLocal() {
