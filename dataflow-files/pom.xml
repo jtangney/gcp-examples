@@ -4,11 +4,16 @@
   <artifactId>dataflow-files</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   
+  <parent>
+    <groupId>com.jtangney.gcpex</groupId>
+    <artifactId>dataflow-parent-pom</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+  </parent>
+  
   <dependencies>
     <dependency>
-      <groupId>com.google.cloud.dataflow</groupId>
-      <artifactId>google-cloud-dataflow-java-sdk-all</artifactId>
-      <version>2.2.0</version>
+       <groupId>org.apache.beam</groupId>
+       <artifactId>beam-runners-direct-java</artifactId>
     </dependency>
     <!-- note, had some issues with latest 1.23.0 api version; use 1.22.0 -->
     <dependency>
@@ -16,35 +21,18 @@
         <artifactId>google-api-services-logging</artifactId>
         <version>v2-rev575-1.22.0</version>
     </dependency>
-    <dependency>
-        <groupId>com.google.apis</groupId>
-        <artifactId>google-api-services-storage</artifactId>
-        <version>v1-rev120-1.22.0</version>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-jdk14</artifactId>
-      <version>1.7.25</version>
-    </dependency>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.12</version>
-      <scope>test</scope>
-    </dependency>
-    
   </dependencies>
 
   <build>
     <plugins>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.7.0</version>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>1.6.0</version>
         <configuration>
-          <compilerVersion>1.8</compilerVersion>
+          <cleanupDaemonThreads>false</cleanupDaemonThreads>
         </configuration>
-      </plugin>
+      </plugin> 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
