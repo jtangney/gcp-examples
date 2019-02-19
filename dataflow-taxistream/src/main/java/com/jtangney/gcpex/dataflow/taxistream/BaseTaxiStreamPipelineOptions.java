@@ -7,13 +7,6 @@ import org.apache.beam.sdk.options.Validation;
 
 public interface BaseTaxiStreamPipelineOptions extends DataflowPipelineOptions {
 
-  @Description("Topic with NYC Taxi data")
-  @Default.String("projects/pubsub-public-data/topics/taxirides-realtime")
-  @Validation.Required
-  String getTopic();
-
-  void setTopic(String topic);
-
   @Description("Subscription with NYC Taxi data")
   @Default.String("projects/jt-demos/subscriptions/taxisub")
   @Validation.Required
